@@ -1,0 +1,118 @@
+---
+title: "01_data-cleaning"
+author: "Ernesto Rojas"
+date: "March 28, 2018"
+output: html_document
+---
+
+##Setting Up
+
+I load the foreign package in order to read data frames from other types of files such as STATA and SPSS. The ncvs data can be found [here](https://www.icpsr.umich.edu/icpsrweb/NACJD/studies/4576). 
+
+The libraries dplyr and plyr were loaded in order to clean and organize my data set, it is important to note that you should load the plyr package prior to loading the dplyr function as this may cause an error message.
+
+Once I have loaded my libraries I focused on setting my working directory, this was necessary because I will later need my working directory set so that it knows where to pull the stata (.dta) data set from. 
+
+```{r}
+
+#Load Libraries
+
+library(foreign) #To load .dta data
+
+library(plyr) #For some reason the rename function was not working with dplyr and I was advised on stack overflow to load plyr which included rename()
+
+library(dplyr) #Used for data manipulation, uses include pipes (%>%) and select function
+
+#Set Working Directory to where you would like to pull the original data file from
+
+setwd("C:/Users/ernes/Google Drive/PS239T/NCVS/ICPSR_04576/DS0002")
+```
+
+
+Using the read.dta function accessed by the foreign package I am able to load my data set. I added "convert.factors = FALSE, convert.dates = TRUE, missing.type = FALSE", the convert.factor was changed from TRUE to false because I continued having a duplicate levels error when it was TRUE. The other two, convert.dates and missing.type I left as default. 
+
+DataCamp has a great video lesson where they discuss the foreign package. There is also an article that they provide [here](https://www.datacamp.com/community/tutorials/r-data-import-tutorial#stata) 
+
+```{r}
+ncvs <- read.dta("Data02.dta", convert.factors = FALSE, convert.dates = TRUE, missing.type = FALSE)
+```
+
+##Cleaning Data
+
+```{r}
+#First I select all the variables I am interested in: MSACC: MSA Core county, V2003: Year and Quarter, V2006: Household Number, V3023: Race Allocated only up until 2003, V3024: Hispanic Origin, V4399: Reported to Police (whether the crime was reported to the police), V4529: Violent Crime. 
+
+ncvs <- select(ncvs, MSACC, V2003, V2006, V2026, V3023, V3024, V4399, V4529)
+
+#Before completing any further cleaning I want to rename the variables so that they are easier to understand and refer to. When knitting I continued getting an error (Error:All arguments must be named), this was a result of using both dplyr and plyr, the solution according to stack overflow was to load the plyr library directly as seen directly below. 
+
+ncvs <- plyr::rename(ncvs, c("V2003" = "year", "V2006" = "houseid", "V2026" = "income", "V3023" = "race", "V3024" = "hispanic", "V4529" = "serious", "V4399" = "reported" ))
+
+#I then want to exclude 2003-04 since the race variable changes for 2003-04 and does not match up to any previous years. However, before I do so I want to simplify the year variable, the NCVS survey breaks the year down into quarter but for the purposes of this project I want to just look at the years as a whole. Therefore, I must recode the variable. I know there must be a simpler way of recoding, however, I had trouble finding solutions on stack overflow. 
+
+
+ncvs$year <- recode(ncvs$year, 
+        `791` = "1979", `792` = "1979", `793` = "1979", `794` = "1979", `801` = "1980", `802` = "1980", `803` = "1980", `804` = "1980",
+        `811` = "1981", `812` = "1981", `813` = "1981", `814` = "1981", `821` = "1982", `822` = "1982", `823` = "1982", `824` = "1982",
+        `831` = "1983", `832` = "1983", `833` = "1983", `834` = "1983", `841` = "1984", `842` = "1984", `843` = "1984", `844` = "1984",
+        `851` = "1985", `852` = "1985", `853` = "1985", `854` = "1985", `861` = "1986", `862` = "1986", `863` = "1986", `864` = "1986",
+        `871` = "1987", `872` = "1987", `873` = "1987", `874` = "1987", `881` = "1988", `882` = "1988", `883` = "1988", `884` = "1988",
+        `891` = "1989", `892` = "1989", `893` = "1989", `894` = "1989", `901` = "1990", `902` = "1990", `903` = "1990", `904` = "1990",
+        `911` = "1991", `912` = "1991", `913` = "1991", `914` = "1991", `921` = "1992", `922` = "1992", `923` = "1992", `924` = "1992",
+        `931` = "1993", `932` = "1993", `933` = "1993", `934` = "1993", `941` = "1994", `942` = "1994", `943` = "1994", `944` = "1994",
+        `951` = "1995", `952` = "1995", `953` = "1995", `954` = "1995", `961` = "1996", `962` = "1996", `963` = "1996", `964` = "1996",
+        `971` = "1997", `972` = "1997", `973` = "1997", `974` = "1997", `981` = "1998", `982` = "1998", `983` = "1998", `984` = "1998",
+        `991` = "1999", `992` = "1999", `993` = "1999", `994` = "1999", `001` = "2000", `002` = "2000", `003` = "2000", `004` = "2000",
+        `011` = "2001", `012` = "2001", `013` = "2001", `014` = "2001", `021` = "2002", `022` = "2002", `023` = "2002", `024` = "2002",
+        `031` = "2003", `032` = "2003", `033` = "2003", `034` = "2003", `044` = "2004", `042` = "2004", `043` = "2004", `044` = "2004",
+        .default = NA_character_)
+
+#Subsetting to exclude 2003-04
+
+ncvs<- subset(ncvs, year <= 2002)
+
+```
+
+Next I look to focus on the serious variable which includes all violent crimes, however, I am looking to only test serious violent crimes. Using the codebook provided by the NCVS I find that values 60 to 70 are serious violent crimes, all other values are non serious violent crimes which I will exclude using the subset function. 
+
+```{r}
+
+#Subsetting for serious violent crimes
+
+ncvs <- subset(ncvs, serious <= 70)
+
+#Additionally since I am only interested in the number of serious violent crimes not reported I subset the "reported" variable which is whether or not it was reported to the police, 1 = yes, 2 = no
+
+ncvs <- subset(ncvs, reported == 2)
+
+#A different data sets will be created as a result (ncvs_hispanic), which will only include those who identified as Hispanic. This data frame was created in order to use it to later plot serious violent crime among Hispanics later on. 
+
+ncvs_hispanic <- subset(ncvs, hispanic <= 1)
+
+#This is done also fo Blacks. Both subsets are saved as new data sets since they will later be used to create graphs. 
+
+ncvs_black <- subset(ncvs, race == 2)
+
+#This is done also for those with a lower socioeconomic status. Using the 2000 Department of Health & Human Services guidelines for the purposes of this study anyone with a household income of lower than $17,761 is classified as living under the poverty line. The guidlines can be found here (https://www.census.gov/prod/2001pubs/p60-214.pdf)
+
+ncvs_income <- subset(ncvs, income <= 3)
+
+```
+
+##Saving Cleaned Data
+
+Below I used the write.csv function in order to convert my data frames to .csv files, the files should save wherever your working directory is set to. 
+
+```{r}
+
+write.csv(ncvs, "clean-ncvs.csv") #Includes all racial groups and economic standing, this serves as the base data set overlooking all 40MSAs as a whole
+
+write.csv(ncvs_hispanic, "clean-ncvs-hispanic.csv") #Includes all other variables included within the clean-ncvs.csv file, however, it only includes those who self identified as Hispanic and excludes any missing values
+
+write.csv(ncvs_black, "clean-ncvs-black.csv") #Includes all other variables included within the clean-ncvs.csv file, however, it only includes those who self identified as Black and excludes any missing values
+
+write.csv(ncvs_income, "clean-ncvs-income.csv") #Includes all other variables included within the clean-ncvs.csv file, however, it only includes those below the poverty line as designated above
+
+```
+
+
