@@ -52,7 +52,7 @@ While I follow the Story Benches guidlines, there were times where I had to impr
 
 #Use key provided by NYTimes API to access API, if you don't have one you can access it here http://developer.nytimes.com/ 
 
-key <- "7f8b93a42e38402489c71db1d9125930"
+key <- "Secret"
 
 #I create the value "term" which will be the term that I am searching for, you can look up individual words or pairs. However, if you have multiple words such as "police presence increase "you must use URLencode.
 
