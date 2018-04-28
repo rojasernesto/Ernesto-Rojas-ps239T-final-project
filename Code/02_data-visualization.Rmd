@@ -5,38 +5,47 @@ date: "April 17, 2018"
 output: html_document
 ---
 
-##Data Visualization
-
 This .rmd file is part of a four part series and follows the file "01_data-cleaning". Below I visualize the data cleaned in the "01_data-cleaning" and further explore my findings. 
 
+Note: Anytime there is a comment in my R chunk the comment refers to the code immediately following below the comment. 
 
-##Setting Up
+Part 1: Setting Up
 
-First I begin by loading the libraries I will be using to vizualize my data and also set my working directory.The libraries dplyr and plyr were loaded in order to clean and organize my data set, it is important to note that you should load the plyr package prior to loading the dplyr function as this may cause an error message.
+First I begin by loading the libraries I will be using to vizualize my data and also set my working directory. The library plyr was loaded instead of dplyr since the package has given me some trouble as noted in 01_data-cleaning. 
 
 Libraries ggplot and ggplot themes were loaded in order to plot/visualize results.
 
 
 ```{r}
-#Loading Libraries 
 
-#library(plyr) #For some reason the rename function was not working with dplyr and I was advised on stack overflow to load plyr which included rename()
-
-library(plyr) #Used for rename function
-
-library(ggplot2) #Used for data visualization
-library(ggthemes) #Used for data visualization, largely for aesthetic purposes/personal preference. 
-
-#Set Working Directory to wherever you have the data sets saved
+#Set Working Directory to where you would like to pull the original data file from
 
 setwd("C:/Users/ernes/Google Drive/PS239T/NCVS/ICPSR_04576/DS0002/")
+
+#Good practice just to clean up environment before carrying on
+
+rm(list=ls())
+
+#Loading Libraries 
+
+#Used for data visualization
+
+library(ggplot2) 
+
+#Loaded in order to use rename function
+
+library(plyr)
+
+#Used for data visualization, largely for aesthetic purposes/personal preference. 
+
+library(ggthemes) 
 
 ```
 
 ```{r}
 #Loading Data Sets
 
-#For more information on what these data sets contain please see the .rmd file "01_data-cleaning"
+#For more information on what these data sets contain please see "Part 3: Saving Cleaned Data" in the .rmd file "01_data-cleaning"
 
 ncvs <- read.csv(file = "clean-ncvs.csv")
 
@@ -49,7 +58,7 @@ ncvs_hispanic <- read.csv(file = "clean-ncvs-hispanic.csv")
 ```
 
 
-##Plotting
+Part 2: Plotting
 
 Below I create a plot for the number of serious violent crimes not reported over time using ggplot. I create various plots which are listed in the order in which they appear below:
 
@@ -57,15 +66,16 @@ Below I create a plot for the number of serious violent crimes not reported over
 
 2. "Hispanics: Serious Violent Crime Not Reported Over Time" (his_plot) - Includes crimes not reported for all 40MSAs together, while only looking at individuals who self identified as Hispanic.
 
-3. "Blacks: Serious Violent Crime Not Reported Over Time" (black_plot) - Includes crimes not reported for all 40MSAs together, while only looking at individuals who self identified as Black
+3. "Blacks: Serious Violent Crime Not Reported Over Time" (black_plot) - Includes crimes not reported for all 40MSAs together, while only looking at individuals who self identified as Black.
 
 4. "Low SES: Serious Violent Crime Not Reported Over Time" (his_plot) - Includes crimes not reported for all 40MSAs together, while only looking at individuals below the poverty line.
 
+I purposely chose red and blue for the my plots since they are easily distinguishable for those who may be colorblind as noted here http://blog.usabilla.com/how-to-design-for-color-blindness/
 
 
 *It is important to note that these plots only look at the number of crimes not reported, not necessarily the rate over time. For the purposes of this project I simply wanted to familiarize myself with the data and present my progress within R. 
 
-Additionally, each plot contains a regression analysis which is accompanied by a brief explanation of what wer are seeing in the summary.
+Additionally, each plot contains a regression analysis which is accompanied by a brief explanation of what we are seeing in the summary.
 
 ```{r}
 
@@ -84,15 +94,21 @@ serious_plot <- rename(serious_plot, c("Var1" = "year", "Freq" = "serious"))
 
 #scale_x_discrete() is included in order to make the dates more presentable, initially I intended to space the x-axis ticks out more, however, since there were many dates I decided to only list every other year but data points for every year are still included. 
 
-ggplot(serious_plot, aes(year, serious, group = 1))+
-  geom_line(color= "firebrick")+
-  geom_point(color= "firebrick")+
-  geom_smooth(method= "lm", se = FALSE)+
-  theme_economist_white()+
-  scale_x_discrete(breaks = c(1980, 1982, 1984, 1986, 1988, 1990, 1992, 1994, 1996, 1998, 2000, 2002)) +
-  labs(x = "Year", y = "Number of Serious Violent Crimes Not Reported")+
-  ggtitle("Serious Violent Crime Not Reported Over Time")+
-  theme(plot.title = element_text(hjust=.5))
+#I saved my plot under a name so that I could more easily save it in the end
+
+plot_a <- ggplot(serious_plot, aes(year, serious, group = 1))+
+            geom_line(color= "firebrick")+
+            geom_point(color= "firebrick")+
+            geom_smooth(method= "lm", se = FALSE)+
+            theme_economist_white()+ #theme used to add aesthetic
+            scale_x_discrete(breaks = c(1980, 1982, 1984, 1986, 1988, 1990, 1992, 1994, 1996, 1998, 2000, 2002)) +
+            labs(x = "Year", y = "Number of Serious Violent Crimes Not Reported")+
+            ggtitle("Serious Violent Crime Not Reported Over Time")+
+            theme(plot.title = element_text(hjust=.5)) #used to center title
+
+#View my plot
+
+plot_a
 
 #ncvs_reg refers to hispanic regression. This was done to see how strong the relationship is as plotted. The function glm refers to generalized linear models, for more information see https://www.statmethods.net/advstats/glm.html.
 
@@ -103,7 +119,7 @@ summary(ncvs_reg)
 
 ```
 
-Below I look at three different groups of people, Hispanics, Blacks, and individuals below the poverty line. Similar to above, I create various graphs showing trends for these groups over time.
+Below I look at three different groups: Hispanics, Blacks, and individuals below the poverty line. Similar to above, I create various graphs showing trends for these groups over time.
 
 For all of these groups, when looking at the most recent data avialable we find that more and more crimes are being reported when compared to previous years. However, when analyzing crimes not reported over time among Hispanics although there is a decrease in 2000 and 2002 the regression line shows that over time, the number of crimes not reported has not decreased.
 
@@ -116,15 +132,19 @@ his_plot <- as.data.frame(his_plot)
 
 his_plot <- rename(his_plot, c("Var1" = "year", "Freq" = "serious"))
 
-ggplot(his_plot, aes(year, serious, group = 1))+
-  geom_line(color= "firebrick")+
-  geom_point(color= "firebrick")+
-  geom_smooth(method= "lm", se = FALSE)+
-  theme_economist_white()+
-  scale_x_discrete(breaks = c(1980, 1982, 1984, 1986, 1988, 1990, 1992, 1994, 1996, 1998, 2000, 2002)) +
-  labs(x = "Year", y = "Number of Serious Violent Crimes Not Reported")+
-  ggtitle("Hispanics: Serious Violent Crime Not Reported Over Time")+
-  theme(plot.title = element_text(hjust=.5))
+plot_b <- ggplot(his_plot, aes(year, serious, group = 1))+
+            geom_line(color= "firebrick")+
+            geom_point(color= "firebrick")+
+            geom_smooth(method= "lm", se = FALSE)+
+            theme_economist_white()+
+            scale_x_discrete(breaks = c(1980, 1982, 1984, 1986, 1988, 1990, 1992, 1994, 1996, 1998, 2000, 2002)) +
+            labs(x = "Year", y = "Number of Serious Violent Crimes Not Reported")+
+            ggtitle("Hispanics: Serious Violent Crime Not Reported Over Time")+
+            theme(plot.title = element_text(hjust=.5))
+
+#View plot
+
+plot_b
 
 #his_reg refers to hispanic regression. This was done to see how strong the relationship is as plotted. The function glm refers to generalized linear models, for more information see https://www.statmethods.net/advstats/glm.html.
 
@@ -143,15 +163,19 @@ black_plot <- as.data.frame(black_plot)
 
 black_plot <- rename(black_plot, c("Var1" = "year", "Freq" = "serious"))
 
-ggplot(black_plot, aes(year, serious, group = 1))+
-  geom_line(color= "firebrick")+
-  geom_point(color= "firebrick")+
-  geom_smooth(method= "lm", se = FALSE)+
-  theme_economist_white()+
-  scale_x_discrete(breaks = c(1980, 1982, 1984, 1986, 1988, 1990, 1992, 1994, 1996, 1998, 2000, 2002)) +
-  labs(x = "Year", y = "Number of Serious Violent Crimes Not Reported")+
-  ggtitle("Black: Serious Violent Crime Not Reported Over Time")+
-  theme(plot.title = element_text(hjust=.5))
+plot_c <- ggplot(black_plot, aes(year, serious, group = 1))+
+            geom_line(color= "firebrick")+
+            geom_point(color= "firebrick")+
+            geom_smooth(method= "lm", se = FALSE)+
+            theme_economist_white()+
+            scale_x_discrete(breaks = c(1980, 1982, 1984, 1986, 1988, 1990, 1992, 1994, 1996, 1998, 2000, 2002)) +
+            labs(x = "Year", y = "Number of Serious Violent Crimes Not Reported")+
+            ggtitle("Black: Serious Violent Crime Not Reported Over Time")+
+            theme(plot.title = element_text(hjust=.5))
+
+#View Plot
+ 
+plot_c
 
 #black_reg refers to black regression. This was done to see how strong the relationship is as plotted. The function glm refers to generalized linear models, for more information see https://www.statmethods.net/advstats/glm.html.
 
@@ -170,15 +194,19 @@ income_plot <- as.data.frame(income_plot)
 
 income_plot <- rename(income_plot, c("Var1" = "year", "Freq" = "serious"))
 
-ggplot(income_plot, aes(year, serious, group = 1))+
-  geom_line(color= "firebrick")+
-  geom_point(color= "firebrick")+
-  geom_smooth(method= "lm", se = FALSE)+
-  theme_economist_white()+
-  scale_x_discrete(breaks = c(1980, 1982, 1984, 1986, 1988, 1990, 1992, 1994, 1996, 1998, 2000, 2002)) +
-  labs(x = "Year", y = "Number of Serious Violent Crimes Not Reported")+
-  ggtitle("Lower SES: Serious Violent Crime Not Reported Over Time")+
-  theme(plot.title = element_text(hjust=.5))
+plot_d <- ggplot(income_plot, aes(year, serious, group = 1))+
+            geom_line(color= "firebrick")+
+            geom_point(color= "firebrick")+
+            geom_smooth(method= "lm", se = FALSE)+
+            theme_economist_white()+
+            scale_x_discrete(breaks = c(1980, 1982, 1984, 1986, 1988, 1990, 1992, 1994, 1996, 1998, 2000, 2002)) +
+            labs(x = "Year", y = "Number of Serious Violent Crimes Not Reported")+
+            ggtitle("Lower SES: Serious Violent Crime Not Reported Over Time")+
+            theme(plot.title = element_text(hjust=.5))
+
+#View Plot
+
+plot_d
 
 #income_reg refers to income regression. This was done to see how strong the relationship is as plotted. The function glm refers to generalized linear models, for more information see https://www.statmethods.net/advstats/glm.html.
 
@@ -188,11 +216,12 @@ income_reg <- glm(year ~ serious, data = income_plot, family=binomial(link="logi
 summary(income_reg)
 ```
 
-After visualizing the four plots listed above my original goal was to analyze each group within the 40 MSAs, however, the sample sizes for each group varied from MSA to MSA which makes it difficult to make comparisons between them. For instance, as shown below when looking at individuals who self identified as Black in Anaheim, we find that in certain years we are missing data points. This is also done for Hispanics in the Portland/Vancouver MSA to highlight the same point.
 
-Note: No regression lines or analysis were done for the two plots below since they were created solely for the purposes of depicting their limitations. 
+Part 3: Double Check
 
+After visualizing the four plots listed above my original goal was to analyze each group within the 40 MSAs, however, the sample sizes for each group varied from MSA to MSA which makes it difficult to make comparisons between them. For instance, as shown below when looking at individuals who self identified as Black in Anaheim, I find that in certain years my data is missing data points. This is also done for Hispanics in the Portland/Vancouver MSA to highlight the same point.
 
+Note: No regression lines or analysis were done for the two plots below since they were created solely for the purposes of depicting their limitations.
 
 ```{r}
 #Black Anaheim Plot
@@ -209,13 +238,16 @@ anaheim_plot <- rename(anaheim_plot, c("Var1" = "year", "Freq" = "serious"))
 
 #ggplot results, the scale_x_discrete() function was not included here as it was in previous charts because I wanted to highlight that data was only available for certain years given that no samples existed for certain years such as 1980 and 2000.
 
-ggplot(anaheim_plot, aes(year, serious, group = 1))+
-  geom_line(color= "firebrick")+
-  geom_point(color= "firebrick")+
-  theme_economist_white()+
-  labs(x = "Year", y = "Number of Serious Violent Crimes Not Reported")+
-  ggtitle("Anaheim (Black): Serious Violent Crime Not Reported Over Time")+
-  theme(plot.title = element_text(hjust=.5))
+plot_e <- ggplot(anaheim_plot, aes(year, serious, group = 1))+
+            geom_line(color= "firebrick")+
+            geom_point(color= "firebrick")+
+            theme_economist_white()+
+            labs(x = "Year", y = "Number of Serious Violent Crimes Not Reported")+
+            ggtitle("Anaheim (Black): Serious Violent Crime Not Reported Over Time")+
+            theme(plot.title = element_text(hjust=.5))
+#View Plot
+
+plot_e
 
 ```
 
@@ -234,14 +266,17 @@ pv_plot <- rename(pv_plot, c("Var1" = "year", "Freq" = "serious"))
 
 #ggplot results, the scale_x_discrete() function was not included here as it was in previous charts because I wanted to highlight that data was only available for certain years given that no samples existed for certain years such as 1993 and 2002.
 
-ggplot(pv_plot, aes(year, serious, group = 1))+
-  geom_line(color= "firebrick")+
-  geom_point(color= "firebrick")+
-  theme_economist_white()+
-  labs(x = "Year", y = "Number of Serious Violent Crimes Not Reported")+
-  ggtitle("PV (Hispanic): Serious Violent Crime Not Reported Over Time")+
-  theme(plot.title = element_text(hjust=.5))
+plot_f <-ggplot(pv_plot, aes(year, serious, group = 1))+
+          geom_line(color= "firebrick")+
+          geom_point(color= "firebrick")+
+          theme_economist_white()+
+          labs(x = "Year", y = "Number of Serious Violent Crimes Not Reported")+
+          ggtitle("PV (Hispanic): Serious Violent Crime Not Reported Over Time")+
+          theme(plot.title = element_text(hjust=.5))
 
+#view Plot
+
+plot_f
 ```
 
 With regard to those individuals with a low SES all 40MSAs were not analyzed because although unlike the Hispanic and Black populations noted above there are data points for almost every year, however, through closer inspection I found that certain MSAs have sample sizes of 1 which make it difficult to compare MSAs accurately and to draw any clear conclusions. I was able to realize this by using a simple table function. 
@@ -265,8 +300,34 @@ table(income_pv$year)
 
 ```
 
+Part 4: Saving Result
 
+```{r}
 
+#Save my plot into file, should go to wherever working directory is set.
 
+#NCVS plot containing serious violent crime
+
+ggsave(filename="ncvs_plot.jpg", plot=plot_a)
+
+#Hispanic ncvs plot
+
+ggsave(filename="hispanic_plot.jpg", plot=plot_b)
+
+#Black ncvs plot
+
+ggsave(filename="black_plot.jpg", plot=plot_c)
+
+#Low SES ncvs plot
+
+ggsave(filename="low_ses_plot.jpg", plot=plot_d)
+
+#Below are the two plots checking sample sizes for the two groups
+
+ggsave(filename="black_anaheim_plot.jpg", plot=plot_e)
+
+ggsave(filename="hispanic_pv_plot.jpg", plot=plot_f)
+
+```
 
 

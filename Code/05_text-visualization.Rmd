@@ -1,0 +1,178 @@
+---
+title: "Text Visualization"
+author: "Ernesto Rojas"
+date: "April 26, 2018"
+output: html_document
+---
+
+Below I visualize my results from my text analysis found in 04_text-analysis.rmd and I compare those results to my initial findings from 02_data-visualization. 
+
+Note: Anytime there is a comment in my R chunk the comment refers to the code immediately following below the comment. 
+
+Part 1: Setting Up
+
+```{r}
+
+#Set Working Directory
+
+setwd("C:/Users/ernes/Google Drive/PS239T/NCVS/ICPSR_04576/DS0002/")
+
+#Good practice just to clean up environment before carrying on
+
+rm(list=ls())
+
+#Loading libraries
+
+#Used to create plots
+
+library(ggplot2)
+
+#Used alongside ggplot2 in order to add an aesthetic theme to plots
+
+library(ggthemes)
+
+#Used to group plots together in order to make better comparisons
+
+library(cowplot)
+
+#Included in order to clean my data
+library(dplyr)
+
+```
+
+Below I load my csv file of interest
+```{r}
+#Read in CSV file containing ncvs data which was created in 01_data-cleaning
+
+ncvs <- read.csv(file = "clean-ncvs.csv")
+
+#Read in .csv file containing nytimes_final data created in 04_text-analysis
+
+nytimes_final <-read.csv("nytimes.csv", header=TRUE)
+
+
+```
+
+Part 2: Plotting Graphs
+
+Below I want to plot both by ncvs data and nytimes_final data to see if we can see a trend between the number of articles discussing an increase in police presence and non-reporting. The two plots below use code with minor changes from 01_data-cleaning and 04_text-analysis, this was done since I will be comparing my work that was collected throughout my project. 
+
+```{r}
+
+#First I created a seperate data set which included the number of serious crimes per year, I did this by using the data from a table then converting it to a data frame.
+
+serious_plot <- table(ncvs$year)
+
+serious_plot <- as.data.frame(serious_plot)
+
+#Just for ease of use I renamed the variables so that they would make more sense. 'Year' is the years from 1980 to 2002 and 'serious' is the number of serious violent crimes not reported to the police. The plyr package needed to be called due to similar reasons as described in length in my previous rmd files. 
+
+serious_plot <- plyr::rename(serious_plot, c("Var1" = "year", "Freq" = "serious"))
+
+
+#Plot containing serious violent crimes not reported. I used ggplot and added some flair by adding color. I also added a regression line using geom_smooth in order to highlight the trend overtime. 
+
+#scale_x_discrete() is included in order to make the dates more presentable, initially I intended to space the x-axis ticks out more, however, since there were many dates I decided to only list every other year but data points for every year are still included. My plot was saved as a g1 because later on I will use this plot to compare to g2 which can be found below. 
+
+g1 <- ggplot(serious_plot, aes(year, serious, group = 1))+
+        geom_line(color = "firebrick") +
+        geom_point(color = "firebrick")+
+        geom_smooth(method= "lm", se = FALSE)+ #Checking regression line
+        scale_x_discrete(breaks = c(1980, 1982, 1984, 1986, 1988, 1990, 1992, 1994, 1996, 1998, 2000, 2002)) + #Used to space out years
+        labs(x = "Year", y = "Unreported Crimes")+
+        ggtitle("Number of Serious Violent Crimes Not Reported Over Time")+
+        theme(plot.title = element_text(hjust=.5)) + #Used hjust in order to center my title text 
+        scale_color_colorblind() #Included for those who may be colorblind such as my roommate who really appreciated this
+
+#View my plot
+
+g1
+  
+```
+
+Here I create my plot for the number of articles over time which will ultimately be compared to g1. 
+
+```{r}
+num_article <- table(nytimes_final$date)
+
+#Once I have this table saved, I convert it to a data frame so that I can access and split my results
+
+num_article <- as.data.frame(num_article)
+
+#R automatically saves/renames the columns as Var1(the year) and Freq(the frequency/number of articles that appear in that year). However, just to make things easier to work with I rename them. Year refers to the years from 1980 to 2002 and articles refer to the number of articles per year. 
+
+num_article <- plyr::rename(num_article, c("Var1" = "year", "Freq" = "article"))
+
+#Lastly I use ggplot to visualize my results, below you can see comments I have added to almost every line
+
+g2 <- ggplot(num_article, aes(year, article, group = 1))+
+        geom_line(color= "firebrick")+
+        geom_point(color= "firebrick")+
+        geom_smooth(method= "lm", se = FALSE)+ #checking regression line
+        scale_x_discrete(breaks = c(1980, 1982, 1984, 1986, 1988, 1990, 1992, 1994, 1996, 1998, 2000, 2002)) + #used to space out years
+        labs(x = "Year", y = "Number of Articles")+
+        ggtitle("Number of Articles on Increased Police Presence")+
+        theme(plot.title = element_text(hjust=.5))+ #Used hjust in order to center my title text
+        scale_color_colorblind() #Included for those who may be colorblind such as my roommate who really appreciated this
+
+#View my plot
+
+g2
+```
+
+Part 3: Analysis
+
+Lastly, I plot both graphs simultaneoulsy above one another in order to allow for a better comparison using the ggdraw() function. You can learn various other ways to do this by also looking [here](https://www.r-bloggers.com/ggplot2-easy-way-to-mix-multiple-graphs-on-the-same-page/). I will call this first method, Method A.
+
+Method B can be found [here](https://stackoverflow.com/questions/21192002/how-to-combine-2-plots-ggplot-into-one-plot). Here I place both graphs above one another in order to get a closer look at the relationship/trends overtime. 
+
+
+```{r}
+
+#Method A: ggdraw is accessed by loading the cowplot package. It was chosen because it gives the most freedom to play with my graphs and their positioning. The x and y refer to where I want them to appear, imagine a graph with four quadrants, the numbers refer to where on the quadrants I want the plots to appear. Height/width refers to the height/width of my plot and can be customized to one's liking.
+
+final_plotA <- ggdraw()+
+                draw_plot(g1, x = 0, y = .5, width = 1, height = .52)+
+                draw_plot(g2, x = 0, y = 0, width = 1, height = .52)
+
+#View Plot
+
+final_plotA
+
+#Method B: Below is method B which combines and places both plots on top of one another. It is important to note that when including aesthetics and data they must be named, for example you cannot use aes(year, serious), you must note what they are reffering to ie. (aes(x = year, y = serious)). Also, it is important to note that this method can be misleading given that one must change the y-axis to visualize the plot and may skew results. 
+
+final_plotB <- ggplot() +
+                  #NCVS Plot
+                  geom_line(data=serious_plot, aes(x=year, y=serious/20, group = 1, color = "NCVS")) +#the serious variable was divided by 20 in                    order to make the comparison easier
+                  scale_x_discrete(breaks = c(1980, 1982, 1984, 1986, 1988, 1990, 1992, 1994, 1996, 1998, 2000, 2002)) + #used to space out years
+                  #NyTimes Articles Plot
+                  geom_line(data=num_article, aes(x=year, y=article, group = 1, color = "NYTimes"))+
+                  labs(x = "Year", y = "Number of Articles/Unreported Crimes")+
+                  ggtitle("Trend Over Time")+
+                  theme(plot.title = element_text(hjust=.5)) + #Used hjust in order to center my title text
+                  theme(legend.title=element_blank())+ #Used to hide legend title
+                  scale_color_colorblind() #Included for those who may be colorblind such as my roommate who really appreciated this. This was not done                   for my other charts, however, I purposely chose red and blue for the previous charts since they are easily distinguishable as noted                    here http://blog.usabilla.com/how-to-design-for-color-blindness/
+
+
+
+#View Plot
+
+final_plotB
+
+```
+
+Part 4: Saving Results
+
+```{r}
+#Save my plot into file, should go to wherever working directory is set.
+
+ggsave(filename="Final_ComparisonA.jpg", plot=final_plotA)
+
+ggsave(filename="Final_ComparisonB.jpg", plot=final_plotB)
+
+```
+
+Part 5: Final Results
+
+All in all, I after I looked over my results and after all my work it does not appear that there is a solid relationship between police presence and the nonreporting of crimes over time. Even when looking at nonreporting in file 02_data-visualization there does not appear to be a clear trend with regard to unreported violent crimes over time, this is especially evident when we look at sub groups. Additionally, my methodology of picking articles from the NYTimes may not be the best or most accurate method of measuring police presence, however, given limitations to how far back I can gather labor statistics for police officers in all 40 MSAs I am glad I gave it a shot. Overall, although my results did not plan out as expected I was glad to have learned these various skills in R. 
+

@@ -1,0 +1,306 @@
+---
+title: "NYTimes API"
+author: "Ernesto Rojas"
+date: "April 7, 2018"
+output: html_document
+---
+
+This Rmd file focuses on creating and collecting data from the NYTimes API.
+
+Note: Anytime there is a comment in my R chunk the comment refers to the code immediately following below the comment. 
+
+Part 1: Setting Up
+
+```{r}
+
+#Set Working Directory to where you would like to pull the original data file from
+
+setwd("C:/Users/ernes/Google Drive/PS239T/NCVS/ICPSR_04576/DS0002/")
+
+#Good practice just to clean up environment before carrying on
+
+rm(list=ls())
+
+#Load libraries
+
+#Included in order to clean/organize data using select() and others. Whenever, I wanted to use rename() I would call on the plyr package directly.
+
+library(dplyr)  
+
+#Included so that I could use the ggplot function to visualize data later on for the purposes of cleaning
+
+library(ggplot2)
+
+#Used to add aesthetics to ggplots
+
+library(ggthemes)
+
+#jsonlite installed and used in order to help us access NY Times API data much more easily. 
+
+library(jsonlite)
+
+
+```
+
+
+In setting up my API while I initially started by using the methods/steps we learned in class, in finding guides I was able to find an API guide specifically for the NYTimes which used two methods to access the API. It can be found [here](http://www.storybench.org/working-with-the-new-york-times-api-in-r/). 
+
+While I follow the Story Benches guidlines, there were times where I had to improvise and change my code as a result of differences. For instance, the guide did not discuss the use of URLencode. Additionally, the guide focused on a small time frame, whereas, I had 22 years (NYTimes API only allows you to access data as far back as 1980) of articles to parse through. I detail below how I went about tackling these issues. 
+
+```{r}
+#Setting Up the API
+
+#Use key provided by NYTimes API to access API, if you don't have one you can access it here http://developer.nytimes.com/ 
+
+key <- "7f8b93a42e38402489c71db1d9125930"
+
+#I create the value "term" which will be the term that I am searching for, you can look up individual words or pairs. However, if you have multiple words such as "police presence increase "you must use URLencode.
+
+term <- "police presence increase"
+
+#URLencode is used so that later on when inputing the term into the base url it is read as a url as opposed to you having to write %20 when you include a space in between words.
+
+#If we wanted to string together separate words we then just use "+" in between each term (Example: police+presence+increase).
+
+term<-URLencode(URL = term, reserved = TRUE)
+
+#Begin data and end date refer to the time span I would like the API to search through the NYTIMES. 
+
+begin_date <- "19800101"
+
+end_date <- "20021231"
+
+```
+
+
+Part 2: Requesting Articles
+
+Below I use the above values that I have created in order to set up my query.
+
+```{r}
+
+#Query
+
+#I use the paste0() function to concatenate the strings below.
+
+  baseurl <- paste0("http://api.nytimes.com/svc/search/v2/articlesearch.json?q=",term,
+                  "&begin_date=",begin_date,"&end_date=",end_date,
+                  "&facet_filter=true&api-key=",key, sep="")
+
+
+```
+
+Unfortunately, the NYTimes only allows 10 articles per page because of this we want to set up a search so that we do not have to estimate how many pages we actually need to ask for.
+
+```{r}
+
+#initialQuery uses the fromJSON() function in order to gather the number of Hits given by the query, in the case of the year 1980 we find 462 Hits
+
+initialQuery <- fromJSON(baseurl)
+
+#Now that we know we have 1047 hits we divide that by 10 since thats how many articles are found on each page and in doing so we know how many pages we need to send a request for. However, it is much easier if we create a value that automatically does this for us rather than have to do the math 22 times. 
+
+maxPages <- round((initialQuery$response$meta$hits[1] / 10)-1) 
+
+```
+
+Thankfully the guide noted above created a for loop which queries each page starting from 0 since that is the first page and continues until the max page.
+
+Furthermore, the for loop also includes sys.sleep() which is in place to create breaks between queries given that the NYTimes API kicks you off if you ask for too many requests at once. 
+
+Lastly, below is a list of errors which I encountered and how to resolve them. 
+
+1. Error 400: If you attempt to query all the pages at once for all the years, once you reach your 200th page request you will automatically get this error (Solution: I tried contacting the nytimes, however, they have not gotten back to me. I chose to specify my search instead (use a more specific search term) which minimized the number of pages I would have to request).
+
+2. Error 429: Basically you have reached your limit for the day which I believe is 1000 requests (Solution: Create a different key and continue collecting data)
+
+3: Error 504: This is associated with the NYTimes servers being down. Sometimes you won't receive this message and it will just say an error occured (Solution: Patience, just try running the request again or increasing the seconds on sys.sleep())
+
+```{r}
+
+#The initial loop I got from the website noted aboce was similar to the one below, however, rather than have Sys.sleep(1) I set it to Sys.sleep(3) which means that it pauses for 3 seconds before it sends another request. If we send many requests at once and too quickly the NYTimes API does is likely to respond with an error message. 
+
+#Note: Jae and I spoke and he said that 5 seconds tends to be the standard we should use when using Sys.sleep, but when I would use 5 seconds it would crash(error 504) more often so I opted for 3 seconds
+
+pages <- list()
+          for(i in 0:maxPages){
+            nytSearch <- fromJSON(paste0(baseurl, "&page=", i), flatten = TRUE) %>% data.frame() 
+            message("Retrieving page ", i)
+            pages[[i+1]] <- nytSearch 
+            Sys.sleep(3)  
+          }
+
+```
+
+I then need to combine all the pages/results that I gathered/pulled. In order to combine them I use the rbind_pages() function provided by jsonlite which combines a list of dataframes into one.
+
+*Note: rbind.pages() works as well. 
+
+```{r}
+
+nytimes <- rbind_pages(pages)
+
+```
+
+Part 3: Data Cleaning
+
+After combining my results I parse through the data and cleaned the data. I used the select function first to parse through all the columns included in my get requests and then renamed them in order to organize the data and make it easier to understand. Below is a list of the final columns and what they are, I recommend that if you want to familiarize yourself with each variable you should use the head() function as seen below. 
+
+source: URL to original article
+
+snippet: Includes the first 40-45 words of the article
+
+summary: This is a summary provided by the NYTimes which summarizes the entire article in about 4 lines
+
+date: Date article was published
+
+doc_type: Type of article, is it an Op-Ed, editorial, letter, news article to name a few.
+
+id: Article I.D. included so that we can refer to each individual article if necessary. 
+
+headline: Headline/title of article
+
+author: Who wrote the article, not necessarily needed, however, I think it is good practice to include who wrote it... maybe we may find one article useful and want to see what else an author has written. 
+
+```{r}
+#Using select function to pick variables of interest
+
+nytimes <- select(nytimes, "response.docs.web_url", "response.docs.snippet", "response.docs.abstract", "response.docs.pub_date", "response.docs.type_of_material", "response.docs._id", "response.docs.headline.main", "response.docs.byline.original")
+
+
+#Using rename function to clean and organize the selected variables (Sometimes I would get an error informing me that "All arguments must be named", in order to solve this I would include the plyr::rename library with rename. For some reason the rename function works on and off with dplyr as a result, there were times where I needed to call the plyr package. )
+
+nytimes <- plyr::rename(nytimes, c("response.docs.web_url" = "source", "response.docs.snippet" = "snippet", "response.docs.abstract" = "summary","response.docs.pub_date" = "date", "response.docs.type_of_material" = "doc_type", "response.docs._id" = "id", "response.docs.headline.main" = "headline", "response.docs.byline.original" = "author" ))
+
+#Used the head() function to familiarize myself with the new variables and to see if any immediate issues stand out
+          
+head(nytimes$source)
+head(nytimes$snippet)
+head(nytimes$summary)
+head(nytimes$date)
+head(nytimes$doc_type)
+head(nytimes$id)
+head(nytimes$headline)
+head(nytimes$byline)
+
+
+```
+
+
+
+
+Given that I have quite a few articles, I want to make sure that they are all actually covering the news. In order to do this, I opt to visualize the types of documents I have avialable using ggplot. 
+
+```{r}
+# Visualize coverage by section, saved as sec_vis, short for section visualization. 
+
+sec_vis <- nytimes %>% 
+            group_by(doc_type) %>%
+            summarize(count=n()) %>%
+            mutate(percent = (count / sum(count))*100) %>%
+            ggplot() +
+            geom_bar(aes(y=percent, x=doc_type, fill=doc_type), stat = "identity") + coord_flip()
+
+#View sec_vis
+
+sec_vis
+
+#Save my plot into file, should go to wherever working directory is set.
+
+ggsave(filename="section_visualization.jpg", plot=sec_vis)
+
+
+```
+
+Having visualized the document types I realized that I was only interested in News, Articles, and Summaries which accounted for the majority of my original findings, things such as obituaries were excluded.
+
+```{r}
+
+#Here I use the grepl() function in order to subset my data frame as guided by this stackoverflow forum: https://stackoverflow.com/questions/24626859/subset-rows-in-data-frame-using-a-list-of-characters  
+
+nytimes <- nytimes[grepl("News|Article|Summary", nytimes$doc_type), ]
+
+
+```
+
+Next I noticed that the date column included the time zone along with extra zeros and since I am only focusing on the year these articles were published I decided to use the as.Date function to convert the intial date to a year-month-date format. Once that is done, I use the format() function which allows me to solely focus on the year. Here's a great [source](https://www.statmethods.net/input/dates.html) I found that helped with working with dates. 
+
+```{r}
+
+#Formating and converting the date, Make sure to save it to the column, if you try to save it to the original data set "nytimes" it will be saved as a value not as a data frame 
+
+nytimes$date <- as.Date(nytimes$date)
+
+#Use format() function in order to save only the year in teh date column, this is done by only including "%Y", however, if you wanted to look at lets say, year and month, you would input "%Y %m". 
+
+nytimes$date <- format(nytimes$date, "%Y")
+
+#Check date function
+
+head(nytimes$date)
+```
+
+Now that I have my year column cleaned, I wanted to quickly visualize my findings in order to better understand my data. Using the same format/code I used in "02_data-visualization" I create a table, convert it to a data frame and then use ggplot to see results.
+
+```{r}
+#First I create a table that tells me how many articles occur per year and then I save this table as num_articles
+
+num_article <- table(nytimes$date)
+
+#Once I have this table saved, I convert it to a data frame so that I can access and plit my results
+
+num_article <- as.data.frame(num_article)
+
+#R automatically saves/renames the columns as Var1(the year) and Freq(the frequency/number of articles that appear in that year). However, just to make things easier to work with I rename them by calling plyr directly since my R continues to read it incorrectly
+
+num_article <- plyr::rename(num_article, c("Var1" = "year", "Freq" = "article"))
+
+#Lastly I use ggplot to visualize my results, below you can see comments I have added to almost every line
+
+art_plot <- ggplot(num_article, aes(year, article, group = 1))+
+              geom_line(color= "firebrick")+
+              geom_point(color= "firebrick")+
+              geom_smooth(method= "lm", se = FALSE)+ #checking regression line
+              theme_economist_white()+
+              scale_x_discrete(breaks = c(1980, 1982, 1984, 1986, 1988, 1990, 1992, 1994, 1996, 1998, 2000, 2002)) + #used to space out    years
+              labs(x = "Year", y = "Number of Articles")+
+              ggtitle("Number of Articles on Increased Police Presence")+
+              theme(plot.title = element_text(hjust=.5)) #Used hjust in order to center my title text
+
+#View Plot
+
+art_plot
+
+#Save my plot into file, should go to wherever working directory is set.
+
+ggsave(filename="article_not_clean.jpg", plot=art_plot)
+
+```
+
+
+Part 3: Converting to CSV
+
+Now that I have the API data which is clean I want to use text analysis. While it may appear that police presence is increasing based on these articles(Yes, I know not the most scientific/replicable/ form of measurment, just trying my skills with R), it may be the case that these articles do not contain information that is pertinent to my work. However, rather than go through and read each article, using text analysis in the next rmd file, "04_text-analysis", I will look at the summaries included with the nytimes and decide if they really all are what I am looking for. 
+
+Lastly, before doing that I need to convert my nytimes data base into a csv so that I can use it for text analysis. 
+
+```{r}
+write.csv(nytimes, "nytimes.csv")
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,171 @@
+---
+title: "04_text-analysis"
+author: "Ernesto Rojas"
+date: "April 19, 2018"
+output: html_document
+---
+
+Below I run a text analysis with the goal of combing through the articles I had previously saved in 03_data-api, "nytimes." Using text analysis I search for terms such as countries other than the U.S. in order to delete those articles which covered other nations given that I am focused on crime and policing within the U.S. 
+
+Note: Anytime there is a comment in my R chunk the comment refers to the code immediately following below the comment. 
+
+Part 1: Setting Up: Directory/Libraries
+
+First I begin by setting my working directory and loading the libraries I will use below. 
+```{r}
+
+#Set Working Directory
+
+setwd("C:/Users/ernes/Google Drive/PS239T/NCVS/ICPSR_04576/DS0002/")
+
+#Good practice just to clean up environment before carrying on
+
+rm(list=ls())
+
+#Below are the libraries I loaded to work with my code
+
+#Framework for text mining
+library(tm) 
+
+#Used to clean data with functions such as select and subset
+library(dplyr)
+
+#Used to clean data and pull out countries outside of the U.S. using the str_detect() function
+library(stringr)
+```
+
+
+Part 2: Setting Up: Data
+
+Below I look to read my data from a csv and clean my data. 
+
+```{r}
+
+#Read in CSV file
+
+nytimes <-read.csv("nytimes.csv", header=TRUE)
+
+names(nytimes)
+
+#Since I want to specifically look at the summary column, I use the select function. I also included the date variable in the event that I want to conduct further analysis within certain time frames. Other columns/variables could have also been chosen such as snippet. Snippet was not chosen in this case because it only presents the first couple of words in an article, whereas summary includes a summary from the editor, though there are not summaries for every article. 
+
+nytimes <- select(nytimes, "summary", "date")
+
+#Next I use the head() function just to familiarize myself with the data
+
+head(nytimes$summary)
+
+#Through further inspection using the head() function I found that I had some missing values in the summary column, thus, I use na.omit to only include articles that have a summary
+
+nytimes <- na.omit(nytimes)
+
+#Once I have my data set ready, I create a new data set called nytimes_sum which stands for nytimes summary. I also used the corpus(vectorSource()) combination to input a corpus so that I can check word frequencies later on
+
+nytimes_sum <- Corpus(VectorSource(nytimes$summary))
+
+
+```
+
+Part 3: Working with Document-Term Matrix
+
+```{r}
+#Use package tm in order to convert my corupus to a Document-Term Matrix(DTM) all in one step. 
+
+dtm <- DocumentTermMatrix(nytimes_sum,
+           control = list(tolower = TRUE,
+                          removePunctuation = TRUE,
+                          removeNumbers = TRUE,
+                          stopwords = TRUE,
+                          stemming=TRUE))
+
+```
+
+Next in order to check how many terms appear in my summaries I first convert my dtm into a matrix by using the as.matrix function. I then use the colSums function to see the number of words. This is all saved as the vector value "x". 
+
+```{r}
+#Converting from dtm to matrix
+
+x <- (as.matrix(dtm))
+
+#Summing up the column counts
+
+x <- colSums(x)
+
+#I use the length() function to check the number of words
+
+length(x)
+```
+
+Part 4: Checking Frequencies
+
+Below I check the frequencies of words. This is done so that I do not have to comb through each article and see what words come up the most, I am largely worried that many of my articles may be focused on other countries, thus by checking frequencies I have an idea if this is the case.
+
+```{r}
+
+#Create the ord vector value using the order() function on "x" in order to sort terms/words by ascending order, if you wanted descending order you would prepend the sorting variable by a minus sign to indicate this. See https://www.statmethods.net/management/sorting.html for more information
+
+ord <- order(x)
+
+#Checking least frequent terms, since its a vector I use brackets [] to access the first element , I then use the head function on ord and include n=() in order to specify that I want more than 6 results as is the default. I use 50 because I am interested in finding the largest number of words without being overwhelmed by inputting n=200 
+
+x[head(ord, n= 50)]
+
+#Checking the most frequent
+x[tail(ord, n = 50)]
+
+```
+
+Nevertheless, although I used the above code I was not pleased with the results and found that I could use findFreqTerms() to look at my dtm list and find the words that were used atleast 10 times each and manually reading them (better than reading 263 summaries). 
+
+```{r}
+
+# Have a look at common words
+findFreqTerms(dtm, lowfreq=10) # words that appear at least 50 times
+
+```
+
+I also used the findAssocs() function in order to see words associated with the terms/countries that I found in order to check to see if there were any other terms I missed or did not think of. 
+
+```{r}
+#Create vectors of country names that appeared above as a result of findFreqTerms. It is important that these terms are lowercase since for the dtm dataframe we converted all words to lowercase.
+
+#Also, I created two vectors, words and corr. Words contains the name of the countries which I noted and corr contains the correlation limit I set (.3)
+
+words <- c("albania", "palestinian", "afghanistan", "colombia", "israel", "britain", "kosovo")
+
+corr <- c(.3, .3, .3, .3, .3, .3, .3)
+
+# Which words correlate with the country names? This was done just incase there were associated words that I had missed, for instance when looking at Albania and Kosovo the country Yugoslavia appeared and I subsequently added it to my list of countries to exclude
+
+findAssocs(dtm, words, corr)
+
+```
+
+Part 5: Cleaning Up 
+
+After gathering my list my next step is to clean up my data and leave only articles that focus on the U.S.
+
+```{r}
+
+#First I use the str_detect() function which I used to look for a specific pattern, in this case the name of the countries I found using text analysis above. It is important to note that these names are capitalized because they are parsing through the original summaries and it is safe to assume that they are capitalized since they are names of countries and coming from a credible source, otherwise I could have also made everything in the summary column lowercase.
+
+#Also, I set it up so that the str_detect package which returns a logical value (True/False) would be saved as a new column "nytimes$country", TRUE means the summary mentions one of the countries I want to exclude and FALSE is otherwise. 
+
+nytimes$country <- str_detect(nytimes$summary, pattern="Albania|Palestinian|Afghanistan|Colombia|Israel|Britain|Kosovo|Yugoslavia")
+
+#Having this new column, I subset my data set and exclude all True rows by setting it == to 0 meaning that I only want the FALSE results. 
+
+nytimes_final <- subset(nytimes, country == 0)
+
+```
+
+
+Part 6: Saving as .csv
+```{r}
+
+#Finally I save my new data set and prepare to compare it to my original ncvs results in the file titles 05_text-visualization
+
+write.csv(nytimes_final, "nytimes_final.csv")
+
+```
+
