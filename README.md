@@ -15,17 +15,17 @@ My PS239T final project focused on cleaning crime victimization data from the NC
   - tm
   
 ## Data
-1. "original ncvs" - Refers to the original data collected from the NCVS. The data set was too large to upload but it can be found [here](https://www.icpsr.umich.edu/icpsrweb/NACJD/studies/4576). This was loaded in 01_data-cleaning Part 1.
+1. "original ncvs" - Refers to the original data collected from the NCVS. The data set was too large to upload but it can be found [here](https://www.icpsr.umich.edu/icpsrweb/NACJD/studies/4576) along with its codebook. This was loaded in [01_data-cleaning](https://github.com/rojasernesto/Ernesto-Rojas-ps239T-final-project/blob/master/Code/01_data-cleaning.Rmd) Part 1. 
 
-2. "clean-ncvs.csv" - Refers to the final NCVS data which was converted to readable data in R, has the variables of interest, and cleaned of missing values. See 01_data-cleaning for how this was done. 
+2. "clean-ncvs.csv" - Refers to the final NCVS data which was converted to readable data in R, has the variables of interest, and cleaned of missing values. See [01_data-cleaning](https://github.com/rojasernesto/Ernesto-Rojas-ps239T-final-project/blob/master/Code/01_data-cleaning.Rmd) for how this was done. 
 
-3. "clean-ncvs-black.csv" - Refers to data set similar to that found in the "clean-ncvs" file, however, it only focuses on individuals who self identified as Black. See 01_data-cleaning for how this was done. 
+3. "clean-ncvs-black.csv" - Refers to data set similar to that found in the "clean-ncvs" file, however, it only focuses on individuals who self identified as Black. See [01_data-cleaning](https://github.com/rojasernesto/Ernesto-Rojas-ps239T-final-project/blob/master/Code/01_data-cleaning.Rmd) for how this was done. 
 
-4. "clean-ncvs-hispanic.csv" - Refers to data set similar to that found in the "clean-ncvs" file, however, it only focuses on individuals who self identified as Hispanic. See 01_data-cleaning for how this was done. 
+4. "clean-ncvs-hispanic.csv" - Refers to data set similar to that found in the "clean-ncvs" file, however, it only focuses on individuals who self identified as Hispanic. [01_data-cleaning](https://github.com/rojasernesto/Ernesto-Rojas-ps239T-final-project/blob/master/Code/01_data-cleaning.Rmd) for how this was done. 
 
-5. "clean-ncvs-income.csv" - Refers to data set similar to that found in the "clean-ncvs" file, however, it only focuses on individuals who were below the poverty line. See 01_data-cleaning for how this was done. 
+5. "clean-ncvs-income.csv" - Refers to data set similar to that found in the "clean-ncvs" file, however, it only focuses on individuals who were below the poverty line. See [01_data-cleaning](https://github.com/rojasernesto/Ernesto-Rojas-ps239T-final-project/blob/master/Code/01_data-cleaning.Rmd) for how this was done. 
 
-6. "nytimes.csv" - Refers to data collected as a result of using the NYTimes API. It includes the columns of interest which were renamed. See 03_data-api for how this was done. 
+6. "nytimes.csv" - Refers to data collected as a result of using the NYTimes API. It includes the columns of interest which were renamed. See [03_data-api](https://github.com/rojasernesto/Ernesto-Rojas-ps239T-final-project/blob/master/Code/03_data-api.Rmd) for how this was done. 
 
 7. "nytimes_final.csv" - Refers to the data set which was cleaned using text analysis on the "nytimes.csv" file. See 05_text-visualization for how this was done. 
 
@@ -34,19 +34,19 @@ My PS239T final project focused on cleaning crime victimization data from the NC
 
 2. Final_ComparisonB.jpg - One of two final comparisons where I compare the NCVS nonreporting of serious violent crimes to the number of articles focusing on increased police presence over time. Here I have two graphs plotted on one another to show the trends over time for both results more clearly. For more information see 05_text-visualization.Rms Part 3.
 
-3. article_not_clean.jpg - Graph that shows the results of the number of articles focusing on increased police presence before excluding non-U.S. countries. This can be found in 03_data-api Part 2.
+3. article_not_clean.jpg - Graph that shows the results of the number of articles focusing on increased police presence before excluding non-U.S. countries. This can be found in [03_data-api](https://github.com/rojasernesto/Ernesto-Rojas-ps239T-final-project/blob/master/Code/03_data-api.Rmd) Part 2.
 
-4. black_anaheim_plot.jpg - Initially I was going to analyze not only all 40 MSAs, however, also the three aforementioned groups. This graph depicts the issues I encountered in doing so, in this case, no data for certain groups within specific MSAs during certain years. Based on these results I chose to only look at the U.S. as a whole rather than by specific groups. Here I visualize blacks in the Anaheim metropolitan area. See 02_data-visualization Part 3 for more information.
+4. black_anaheim_plot.jpg - Initially I was going to analyze not only all 40 MSAs, however, also the three aforementioned groups. This graph depicts the issues I encountered in doing so, in this case, no data for certain groups within specific MSAs during certain years. Based on these results I chose to only look at the U.S. as a whole rather than by specific groups. Here I visualize blacks in the Anaheim metropolitan area. See [02_data-visualization](https://github.com/rojasernesto/Ernesto-Rojas-ps239T-final-project/blob/master/Code/02_data-visualization.Rmd) Part 3 for more information.
 
-5. black_plot.jpg - Depicts the number of serious violent crimes not reported to the police from 1980 to 2002 among individuals who self identified as black throughout all 40 MSAs together. See 02_data-visualization Part 2 for more information.
+5. black_plot.jpg - Depicts the number of serious violent crimes not reported to the police from 1980 to 2002 among individuals who self identified as black throughout all 40 MSAs together. See [02_data-visualization](https://github.com/rojasernesto/Ernesto-Rojas-ps239T-final-project/blob/master/Code/02_data-visualization.Rmd) Part 2 for more information.
 
-6. hispanic_pv_plot.jpg -Initially I was going to analyze not only all 40 MSAs, however, also the three aforementioned groups. This graph depicts the issues I encountered in doing so, in this case, no data for certain groups within specific MSAs during certain years. Based on these results I chose to only look at the U.S. as a whole rather than by specific groups. Here I visualize hispanics in the Portland/Vancouver metropolitan area. See 02_data-visualization Part 3 for more information.
+6. hispanic_pv_plot.jpg -Initially I was going to analyze not only all 40 MSAs, however, also the three aforementioned groups. This graph depicts the issues I encountered in doing so, in this case, no data for certain groups within specific MSAs during certain years. Based on these results I chose to only look at the U.S. as a whole rather than by specific groups. Here I visualize hispanics in the Portland/Vancouver metropolitan area. See [02_data-visualization](https://github.com/rojasernesto/Ernesto-Rojas-ps239T-final-project/blob/master/Code/02_data-visualization.Rmd) Part 3 for more information.
 
-7. hispanic_plot.jpg - Depicts the number of serious violent crimes not reported to the police from 1980 to 2002 among individuals who self identified as Hispanic throughout all 40mMSAs together. See 02_data-visualization Part 2 for more information.
+7. hispanic_plot.jpg - Depicts the number of serious violent crimes not reported to the police from 1980 to 2002 among individuals who self identified as Hispanic throughout all 40mMSAs together. See [02_data-visualization](https://github.com/rojasernesto/Ernesto-Rojas-ps239T-final-project/blob/master/Code/02_data-visualization.Rmd) Part 2 for more information.
 
-8. low_ses_plot.jpg - Depicts the number of serious violent crimes not reported to the police from 1980 to 2002 among individuals who fell below the poverty line throughout all 40MSAs together. See 02_data-visualization Part 2 for more information.
+8. low_ses_plot.jpg - Depicts the number of serious violent crimes not reported to the police from 1980 to 2002 among individuals who fell below the poverty line throughout all 40MSAs together. See [02_data-visualization](https://github.com/rojasernesto/Ernesto-Rojas-ps239T-final-project/blob/master/Code/02_data-visualization.Rmd)  Part 2 for more information.
 
-9. ncvs_plot - Depicts the number of serious violent crimes not reported to the police from 1980 to 2002 for all individuals throughout all 40MSAs together. See 02_data-visualization Part 2 for more information.
+9. ncvs_plot - Depicts the number of serious violent crimes not reported to the police from 1980 to 2002 for all individuals throughout all 40MSAs together. See [02_data-visualization](https://github.com/rojasernesto/Ernesto-Rojas-ps239T-final-project/blob/master/Code/02_data-visualization.Rmd) Part 2 for more information.
 
 3. section_visualization.jpg - Barplot used to help visualize and better understand the NyTimes articles I initially collected before doing any cleaning. This chart allowed me to decide what types of news articles I wanted to keep/exclude. See 03_data-api Part 3 for more information. 
 
