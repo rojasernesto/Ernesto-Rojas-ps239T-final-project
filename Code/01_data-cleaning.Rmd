@@ -7,7 +7,7 @@ output: html_document
 
 Part 1: Setting Up
 
-First I set my workign directory and cleaned out my global environment. 
+First I set my working directory and cleaned out my global environment. 
 
 I then loaded the foreign package in order to read data frames from other types of files such as STATA and SPSS. The ncvs data and its codebook can be found [here](https://www.icpsr.umich.edu/icpsrweb/NACJD/studies/4576). 
 
