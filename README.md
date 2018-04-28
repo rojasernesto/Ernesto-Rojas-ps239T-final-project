@@ -32,7 +32,7 @@ My PS239T final project focused on cleaning crime victimization data from the NC
 ## Results
 1. Final_ComparisonA.jpg - One of two final comparisons where I compare the ncvs nonreporting of serious violent crimes to the number of articles focusing on increased police presence over time. Here I have two separate charts on top of one another, for more information see [05_text-visualization.Rmd](https://github.com/rojasernesto/Ernesto-Rojas-ps239T-final-project/blob/master/Code/05_text-visualization.Rmd) Part 3.  
 
-2. Final_ComparisonB.jpg - One of two final comparisons where I compare the NCVS nonreporting of serious violent crimes to the number of articles focusing on increased police presence over time. Here I have two graphs plotted on one another to show the trends over time for both results more clearly. For more information see 05_text-visualization.Rms Part 3.
+2. Final_ComparisonB.jpg - One of two final comparisons where I compare the NCVS nonreporting of serious violent crimes to the number of articles focusing on increased police presence over time. Here I have two graphs plotted on one another to show the trends over time for both results more clearly. For more information see [05_text-visualization.Rmd](https://github.com/rojasernesto/Ernesto-Rojas-ps239T-final-project/blob/master/Code/05_text-visualization.Rmd) Part 3.
 
 3. article_not_clean.jpg - Graph that shows the results of the number of articles focusing on increased police presence before excluding non-U.S. countries. This can be found in [03_data-api](https://github.com/rojasernesto/Ernesto-Rojas-ps239T-final-project/blob/master/Code/03_data-api.Rmd) Part 2.
 
@@ -48,7 +48,7 @@ My PS239T final project focused on cleaning crime victimization data from the NC
 
 9. ncvs_plot - Depicts the number of serious violent crimes not reported to the police from 1980 to 2002 for all individuals throughout all 40MSAs together. See [02_data-visualization](https://github.com/rojasernesto/Ernesto-Rojas-ps239T-final-project/blob/master/Code/02_data-visualization.Rmd) Part 2 for more information.
 
-3. section_visualization.jpg - Barplot used to help visualize and better understand the NyTimes articles I initially collected before doing any cleaning. This chart allowed me to decide what types of news articles I wanted to keep/exclude. See[03_data-api](https://github.com/rojasernesto/Ernesto-Rojas-ps239T-final-project/blob/master/Code/03_data-api.Rmd) Part 3 for more information. 
+3. section_visualization.jpg - Barplot used to help visualize and better understand the NyTimes articles I initially collected before doing any cleaning. This chart allowed me to decide what types of news articles I wanted to keep/exclude. See [03_data-api](https://github.com/rojasernesto/Ernesto-Rojas-ps239T-final-project/blob/master/Code/03_data-api.Rmd) Part 3 for more information. 
 
 
 ## More Information
