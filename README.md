@@ -27,10 +27,10 @@ My PS239T final project focused on cleaning crime victimization data from the NC
 
 6. "nytimes.csv" - Refers to data collected as a result of using the NYTimes API. It includes the columns of interest which were renamed. See [03_data-api](https://github.com/rojasernesto/Ernesto-Rojas-ps239T-final-project/blob/master/Code/03_data-api.Rmd) for how this was done. 
 
-7. "nytimes_final.csv" - Refers to the data set which was cleaned using text analysis on the "nytimes.csv" file. See 05_text-visualization for how this was done. 
+7. "nytimes_final.csv" - Refers to the data set which was cleaned using text analysis on the "nytimes.csv" file. [See 05_text-visualization](https://github.com/rojasernesto/Ernesto-Rojas-ps239T-final-project/blob/master/Code/05_text-visualization.Rmd) for how this was done. 
 
 ## Results
-1. Final_ComparisonA.jpg - One of two final comparisons where I compare the ncvs nonreporting of serious violent crimes to the number of articles focusing on increased police presence over time. Here I have two separate charts on top of one another, for more information see 05_text-visualization.Rmd Part 3. 
+1. Final_ComparisonA.jpg - One of two final comparisons where I compare the ncvs nonreporting of serious violent crimes to the number of articles focusing on increased police presence over time. Here I have two separate charts on top of one another, for more information see [05_text-visualization.Rmd](https://github.com/rojasernesto/Ernesto-Rojas-ps239T-final-project/blob/master/Code/05_text-visualization.Rmd) Part 3.  
 
 2. Final_ComparisonB.jpg - One of two final comparisons where I compare the NCVS nonreporting of serious violent crimes to the number of articles focusing on increased police presence over time. Here I have two graphs plotted on one another to show the trends over time for both results more clearly. For more information see 05_text-visualization.Rms Part 3.
 
@@ -48,7 +48,7 @@ My PS239T final project focused on cleaning crime victimization data from the NC
 
 9. ncvs_plot - Depicts the number of serious violent crimes not reported to the police from 1980 to 2002 for all individuals throughout all 40MSAs together. See [02_data-visualization](https://github.com/rojasernesto/Ernesto-Rojas-ps239T-final-project/blob/master/Code/02_data-visualization.Rmd) Part 2 for more information.
 
-3. section_visualization.jpg - Barplot used to help visualize and better understand the NyTimes articles I initially collected before doing any cleaning. This chart allowed me to decide what types of news articles I wanted to keep/exclude. See 03_data-api Part 3 for more information. 
+3. section_visualization.jpg - Barplot used to help visualize and better understand the NyTimes articles I initially collected before doing any cleaning. This chart allowed me to decide what types of news articles I wanted to keep/exclude. See[03_data-api](https://github.com/rojasernesto/Ernesto-Rojas-ps239T-final-project/blob/master/Code/03_data-api.Rmd) Part 3 for more information. 
 
 
 ## More Information
