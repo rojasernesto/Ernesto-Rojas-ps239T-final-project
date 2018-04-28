@@ -14,6 +14,20 @@ My PS239T final project focused on cleaning crime victimization data from the NC
   - stringr
   - tm
   
+## Code
+ 
+ 1. [01_data-cleaning](https://github.com/rojasernesto/Ernesto-Rojas-ps239T-final-project/blob/master/Code/01_data-cleaning.Rmd): Here I open the original NCVS data and go through and clean it in order to create data sets 2-5 as listed in the Data section below. 
+ 
+ 2. [02_data-visualization](https://github.com/rojasernesto/Ernesto-Rojas-ps239T-final-project/blob/master/Code/02_data-visualization.Rmd): Here I visualize my data which was gathered and cleaned in 01_data-cleaning. 
+ 
+ 3. [03_data-api](https://github.com/rojasernesto/Ernesto-Rojas-ps239T-final-project/blob/master/Code/03_data-api.Rmd): Here I create and API that accesses the NYTimes API. Using the API I gathered articles covering increased police presence within the U.S.
+ 
+ 4. [04_text-analysis](https://github.com/rojasernesto/Ernesto-Rojas-ps239T-final-project/blob/master/Code/04_text-analysis.Rmd): Here I run text analysis with the goal of combing through the articles I had previously saved in 03_data-api, "nytimes." Using text analysis I search for terms such as countries other than the U.S. in order to delete those articles which covered other nations given that I am focused on crime and policing within the U.S. nytimes_final.csv comes from this file. 
+ 
+ 5. [05_text-visualization](https://github.com/rojasernesto/Ernesto-Rojas-ps239T-final-project/blob/master/Code/05_text-visualization.Rmd): Here I visualize my results from my text analysis in 04_text-analysis.Rmd and I compare those results to my initial findings from 02_data-visualization.
+ 
+ 
+  
 ## Data
 1. "original ncvs" - Refers to the original data collected from the NCVS. The data set was too large to upload but it can be found [here](https://www.icpsr.umich.edu/icpsrweb/NACJD/studies/4576) along with its codebook. This was loaded in [01_data-cleaning](https://github.com/rojasernesto/Ernesto-Rojas-ps239T-final-project/blob/master/Code/01_data-cleaning.Rmd) Part 1. 
 
