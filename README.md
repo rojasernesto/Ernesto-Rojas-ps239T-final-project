@@ -15,7 +15,7 @@ My PS239T final project focused on cleaning crime victimization data from the NC
   - tm
   
 ## Data
-1. "original ncvs" - Refers to the original data collected from the NCVS. The data set was too large to upload but it can be found here (https://www.icpsr.umich.edu/icpsrweb/NACJD/studies/4576). This was loaded in 01_data-cleaning Part 1.
+1. "original ncvs" - Refers to the original data collected from the NCVS. The data set was too large to upload but it can be found [here](https://www.icpsr.umich.edu/icpsrweb/NACJD/studies/4576). This was loaded in 01_data-cleaning Part 1.
 
 2. "clean-ncvs.csv" - Refers to the final NCVS data which was converted to readable data in R, has the variables of interest, and cleaned of missing values. See 01_data-cleaning for how this was done. 
 
